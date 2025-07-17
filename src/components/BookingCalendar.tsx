@@ -381,10 +381,44 @@ const BookingCalendar: React.FC = () => {
     }
 
     const sortedDates = [...dates].sort((a, b) => a.getTime() - b.getTime());
-    const firstDate = sortedDates[0];
-    const lastDate = sortedDates[sortedDates.length - 1];
 
-    return `${firstDate.toLocaleDateString()} - ${lastDate.toLocaleDateString()}`;
+    // Group consecutive dates into ranges
+    const ranges: Date[][] = [];
+    let currentRange = [sortedDates[0]];
+
+    for (let i = 1; i < sortedDates.length; i++) {
+      const prevDate = sortedDates[i - 1];
+      const currentDate = sortedDates[i];
+
+      const diffInDays = Math.round(
+        (currentDate.getTime() - prevDate.getTime()) / (1000 * 60 * 60 * 24)
+      );
+
+      if (diffInDays === 1) {
+        // Consecutive day, add to current range
+        currentRange.push(currentDate);
+      } else {
+        // Gap found, save current range and start new one
+        ranges.push(currentRange);
+        currentRange = [currentDate];
+      }
+    }
+
+    ranges.push(currentRange);
+
+    return ranges
+      .map((range) => {
+        if (range.length === 1) {
+          return range[0].toLocaleDateString();
+        } else if (range.length === 2) {
+          return range.map((date) => date.toLocaleDateString()).join(", ");
+        } else {
+          const firstDate = range[0];
+          const lastDate = range[range.length - 1];
+          return `${firstDate.toLocaleDateString()}-${lastDate.toLocaleDateString()}`;
+        }
+      })
+      .join(", ");
   };
 
   const days = getDaysInMonth(currentMonth);
@@ -402,7 +436,7 @@ const BookingCalendar: React.FC = () => {
 
         <p>
           Click on dates to add to or subtract from the total price and number
-          of nights. Maximum 5 days can be selected per booking.
+          of nights.
         </p>
 
         <ProfileSection />
