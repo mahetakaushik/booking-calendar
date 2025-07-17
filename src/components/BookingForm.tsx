@@ -15,6 +15,13 @@ const BookingForm: React.FC<BookingFormProps> = ({
   onCancel,
   onConfirm,
 }) => {
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      onConfirm();
+    }
+  };
+
   return (
     <div className="booking-form">
       <h3>Complete Your Booking</h3>
@@ -25,6 +32,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
           id="guestName"
           value={guestName}
           onChange={(e) => onGuestNameChange(e.target.value)}
+          onKeyPress={handleKeyPress}
           placeholder="Enter guest name"
           className="guest-input"
         />
