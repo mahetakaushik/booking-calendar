@@ -34,7 +34,7 @@ const BookingCalendar: React.FC = () => {
     return [];
   });
 
-  const [currentMonth, setCurrentMonth] = useState(() => {
+  const [currentMonth, setCurrentMonth] = useState<Date>(() => {
     const savedCurrentMonth = localStorage.getItem("currentMonth");
     if (savedCurrentMonth) {
       try {
@@ -58,18 +58,18 @@ const BookingCalendar: React.FC = () => {
     return [];
   });
 
-  const [guestName, setGuestName] = useState(() => {
+  const [guestName, setGuestName] = useState<string>(() => {
     const savedGuestName = localStorage.getItem("guestName");
     return savedGuestName || "";
   });
 
-  const [showBookingForm, setShowBookingForm] = useState(() => {
+  const [showBookingForm, setShowBookingForm] = useState<boolean>(() => {
     const savedShowBookingForm = localStorage.getItem("showBookingForm");
     return savedShowBookingForm === "true";
   });
 
-  const [nameError, setNameError] = useState("");
-  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [nameError, setNameError] = useState<string>("");
+  const [showSuccessModal, setShowSuccessModal] = useState<boolean>(false);
   const [notification, setNotification] = useState<NotificationState | null>(
     null
   );
@@ -80,7 +80,7 @@ const BookingCalendar: React.FC = () => {
   const showNotification = (
     message: string,
     type: "error" | "warning" | "success"
-  ) => {
+  ): void => {
     setNotification({ message, type });
     setTimeout(() => {
       setNotification(null);
@@ -127,7 +127,7 @@ const BookingCalendar: React.FC = () => {
     );
   };
 
-  const toggleDateSelection = (date: Date) => {
+  const toggleDateSelection = (date: Date): void => {
     const isSelected = isDateSelected(date);
 
     if (isSelected) {
@@ -159,7 +159,11 @@ const BookingCalendar: React.FC = () => {
     );
   };
 
-  const addBooking = (startDate: Date, endDate: Date, guestName: string) => {
+  const addBooking = (
+    startDate: Date,
+    endDate: Date,
+    guestName: string
+  ): void => {
     const newBooking: BookedRange = {
       start: formatDate(startDate),
       end: formatDate(endDate),
@@ -237,7 +241,7 @@ const BookingCalendar: React.FC = () => {
     );
   };
 
-  const clearSelection = () => {
+  const clearSelection = (): void => {
     setSelectedDates([]);
     setShowBookingForm(false);
     setGuestName("");
@@ -263,7 +267,7 @@ const BookingCalendar: React.FC = () => {
     return selectedDates.length;
   };
 
-  const handleDateClick = (date: Date) => {
+  const handleDateClick = (date: Date): void => {
     const dateWithoutTime = new Date(
       date.getFullYear(),
       date.getMonth(),
@@ -280,25 +284,32 @@ const BookingCalendar: React.FC = () => {
     toggleDateSelection(date);
   };
 
-  const nextMonth = () => {
+  const nextMonth = (): void => {
     setCurrentMonth(
       new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1)
     );
   };
 
-  const prevMonth = () => {
+  const prevMonth = (): void => {
     setCurrentMonth(
       new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1)
     );
   };
 
-  const handleBookingInitiate = () => {
+  const handleBookingInitiate = (): void => {
     if (selectedDates.length > 0) {
       setShowBookingForm(true);
     }
   };
 
-  const handleBookingConfirm = () => {
+  const handleGuestNameChange = (name: string): void => {
+    if (name.length <= 20) {
+      setGuestName(name);
+      setNameError("");
+    }
+  };
+
+  const handleBookingConfirm = (): void => {
     if (selectedDates.length === 0) {
       showNotification("Please select dates first.", "warning");
       return;
@@ -314,6 +325,11 @@ const BookingCalendar: React.FC = () => {
 
     if (!guestName.trim()) {
       setNameError("Guest name is required");
+      return;
+    }
+
+    if (guestName.length > 20) {
+      setNameError("Guest name must be 20 characters or less");
       return;
     }
 
@@ -360,42 +376,15 @@ const BookingCalendar: React.FC = () => {
 
   const formatDateRange = (dates: Date[]): string => {
     if (dates.length === 0) return "";
-    if (dates.length === 1) return dates[0].toLocaleDateString();
-
-    const sortedDates = [...dates].sort((a, b) => a.getTime() - b.getTime());
-    const ranges: Date[][] = [];
-    let currentRange = [sortedDates[0]];
-
-    for (let i = 1; i < sortedDates.length; i++) {
-      const prevDate = sortedDates[i - 1];
-      const currentDate = sortedDates[i];
-
-      const diffInDays = Math.round(
-        (currentDate.getTime() - prevDate.getTime()) / (1000 * 60 * 60 * 24)
-      );
-
-      if (diffInDays === 1) {
-        currentRange.push(currentDate);
-      } else {
-        ranges.push(currentRange);
-        currentRange = [currentDate];
-      }
+    if (dates.length === 1) {
+      return dates[0].toLocaleDateString();
     }
 
-    ranges.push(currentRange);
-    ranges.sort((a, b) => a[0].getTime() - b[0].getTime());
+    const sortedDates = [...dates].sort((a, b) => a.getTime() - b.getTime());
+    const firstDate = sortedDates[0];
+    const lastDate = sortedDates[sortedDates.length - 1];
 
-    return ranges
-      .map((range) => {
-        if (range.length === 1) {
-          return range[0].toLocaleDateString();
-        } else {
-          return `${range[0].toLocaleDateString()} to ${range[
-            range.length - 1
-          ].toLocaleDateString()}`;
-        }
-      })
-      .join(", ");
+    return `${firstDate.toLocaleDateString()} - ${lastDate.toLocaleDateString()}`;
   };
 
   const days = getDaysInMonth(currentMonth);
@@ -471,7 +460,7 @@ const BookingCalendar: React.FC = () => {
             <BookingForm
               guestName={guestName}
               nameError={nameError}
-              onGuestNameChange={setGuestName}
+              onGuestNameChange={handleGuestNameChange}
               onCancel={clearSelection}
               onConfirm={handleBookingConfirm}
             />

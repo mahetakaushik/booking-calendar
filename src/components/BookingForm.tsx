@@ -18,7 +18,9 @@ const BookingForm: React.FC<BookingFormProps> = ({
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       e.preventDefault();
-      onConfirm();
+      if (guestName.trim() && guestName.length <= 20) {
+        onConfirm();
+      }
     }
   };
 
@@ -35,7 +37,17 @@ const BookingForm: React.FC<BookingFormProps> = ({
           onKeyPress={handleKeyPress}
           placeholder="Enter guest name"
           className="guest-input"
+          maxLength={20}
         />
+        <div className="input-info">
+          <span
+            className={`character-count ${
+              guestName.length > 15 ? "warning" : ""
+            }`}
+          >
+            {guestName.length}/20 characters
+          </span>
+        </div>
         {nameError && <p className="error-message">{nameError}</p>}
       </div>
       <div className="form-actions">

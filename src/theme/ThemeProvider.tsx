@@ -1,5 +1,5 @@
-import React, { createContext, useContext, ReactNode } from 'react';
-import { colors } from './colors';
+import React, { createContext, useContext, ReactNode } from "react";
+import { colors } from "./colors";
 
 interface ThemeContextType {
   colors: typeof colors;
@@ -14,12 +14,10 @@ interface ThemeProviderProps {
 }
 
 export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
-  // For now, we'll use light mode. Dark mode can be implemented later.
-  const [isDarkMode, setIsDarkMode] = React.useState(false);
+  const [isDarkMode, setIsDarkMode] = React.useState<boolean>(false);
 
   const toggleDarkMode = () => {
     setIsDarkMode(!isDarkMode);
-    // Here you could add logic to switch CSS custom properties for dark mode
   };
 
   const value: ThemeContextType = {
@@ -29,18 +27,16 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   };
 
   return (
-    <ThemeContext.Provider value={value}>
-      {children}
-    </ThemeContext.Provider>
+    <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
   );
 };
 
 export const useThemeContext = () => {
   const context = useContext(ThemeContext);
   if (context === undefined) {
-    throw new Error('useThemeContext must be used within a ThemeProvider');
+    throw new Error("useThemeContext must be used within a ThemeProvider");
   }
   return context;
 };
 
-export default ThemeProvider; 
+export default ThemeProvider;
