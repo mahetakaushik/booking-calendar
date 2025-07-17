@@ -103,14 +103,6 @@ A modern, responsive booking calendar built with React and TypeScript that allow
 3. **Code Splitting**: Lazy load calendar component
 4. **Image Optimization**: Optimize any property images
 
-Breakdown:
-
-- Project setup and component structure: 30 minutes
-- Core calendar logic and date selection: 90 minutes
-- Styling and responsive design: 90 minutes
-- Testing and refinements: 30 minutes
-- Documentation: 30 minutes
-
 ## Future Enhancements
 
 1. **Backend Integration**: Connect to real API for pricing and availability
